@@ -1,12 +1,15 @@
 from models.Message import Message
+from models.ChatRoom import ChatRoom, DualUser, MultiUser
+from typing import Union, cast
 
 class User:
     usernames: list[str] = []
 
-    def __init__(self, username: str, email: str, password: str) -> None:
+    def __init__(self, username: str, email: str = "", password: str = "") -> None:
         if username.isalnum():
             raise ValueError("Username must contain at least one non-alphanumeric character")
-        elif User.verifyUsername(username):
+        
+        if User.verifyUsername(username):
             raise ValueError("Username already exists")
 
         self._username: str = username
@@ -18,17 +21,18 @@ class User:
 
     @property
     def username(self) -> str:
-        return f"Username: {self._username}"
+        return self._username
     
     @property 
     def email(self) -> str:
-        return f"Email: {self._email}"
+        return self._email
     
     @username.setter
     def username(self, new_username: str) -> None:
         if new_username.isalnum():
             raise ValueError("Username must not be alphanumeric")
-        elif User.verifyUsername(new_username):
+        
+        if User.verifyUsername(new_username):
             if self._username == new_username:
                 raise ValueError("Kindly enter a different username")
             else:
@@ -48,3 +52,19 @@ class User:
     
     def inputChat(self, message: Message) -> None:
         self._messages.append(message)
+
+    def createChatRoom(self, type: str, other_user: Union["User", list["User"], str] = "") -> Union[DualUser, MultiUser]:
+        chat: ChatRoom
+
+        if type == "dual" and not isinstance(other_user, User):
+            raise ValueError("A single user is required with dual")
+        
+        if type == "multi" and not isinstance(other_user, list):
+            raise ValueError("A list of users is required with multi")
+
+        if type == "dual":
+            chat = DualUser(self, cast(User, other_user))
+        else:
+            chat = MultiUser(self, cast(list[User] , other_user))
+
+        return chat
