@@ -1,6 +1,5 @@
 from models.Message import Message
-from models.ChatRoom import ChatRoom, DualUser, MultiUser
-from typing import Union, cast
+from models.ChatRoom import DualUser, MultiUser
 
 class User:
     usernames: list[str] = []
@@ -53,18 +52,8 @@ class User:
     def inputChat(self, message: Message) -> None:
         self._messages.append(message)
 
-    def createChatRoom(self, type: str, other_user: Union["User", list["User"], str] = "") -> Union[DualUser, MultiUser]:
-        chat: ChatRoom
-
-        if type == "dual" and not isinstance(other_user, User):
-            raise ValueError("A single user is required with dual")
-        
-        if type == "multi" and not isinstance(other_user, list):
-            raise ValueError("A list of users is required with multi")
-
-        if type == "dual":
-            chat = DualUser(self, cast(User, other_user))
-        else:
-            chat = MultiUser(self, cast(list[User] , other_user))
-
-        return chat
+    def createDualUserRoom(self, other_user: "User") -> DualUser:
+        return DualUser(self, other_user)
+    
+    def createMultiUserRoom(self, other_users: list["User"] = []) -> MultiUser:
+        return MultiUser(self, other_users)

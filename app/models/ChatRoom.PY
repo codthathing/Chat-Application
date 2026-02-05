@@ -9,7 +9,9 @@ class ChatRoom(ABC):
     chatrooms: list["ChatRoom"] = []
 
     def __init__(self, user: "User") -> None:
-        if user.username not in user.__class__.usernames:
+        from models.User import User
+
+        if user.username not in User.usernames:
             raise ValueError("Not a user so can't create a room")
 
         self._room_id: int = randint(0, 1000)
@@ -25,7 +27,9 @@ class ChatRoom(ABC):
 
 class DualUser(ChatRoom):
     def __init__(self, user: "User", other_user: "User") -> None:
-        if other_user.username not in user.__class__.usernames:
+        from models.User import User
+
+        if other_user.username not in User.usernames:
             raise ValueError(f"{other_user.username} not a user, kindly create a room with a user")
 
         super().__init__(user)
@@ -39,8 +43,10 @@ class DualUser(ChatRoom):
 
 class MultiUser(ChatRoom):
     def __init__(self, user: "User", other_users: list["User"] = []) -> None:
+        from models.User import User
+
         for u in other_users:
-            if u.username not in user.__class__.usernames:
+            if u.username not in User.usernames:
                 raise ValueError(f"{user.username} not a user, kindly remove")
 
 
