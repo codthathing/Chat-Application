@@ -1,15 +1,19 @@
 from models.User import User
 from models.ChatRoom import MultiUser, DualUser
+from schemas.UsersRoomSchema import UsersRoomSchema
 
-segun = User("@pheezy", "akinwunmiolusegun277@gmail.com", "#Pheezy123")
-bolu = User("@tife", "boluwatifeakinwunmi@gmail.com", "tife123")
-abiodun = User("@abiodun", "akinwunmi.abiodun1965@gmail.com", "abiodun1965")
-folabi = User("@folabi", "afolabi.creator@gmail.com", "#Pheezy123")
-print(User.usernames)
+chatSchema = UsersRoomSchema()
 
-group: MultiUser = bolu.createMultiUserRoom([segun, folabi])
+segun: User = chatSchema.createUser("@pheezy", "akinwunmiolusegun277@gmail.com")
+bolu: User = chatSchema.createUser("@tife", "boluwatifeakinwunmi@gmail.com")
+abiodun: User = chatSchema.createUser("@abiodun", "akinwunmi.abiodun1965@gmail.com")
+folabi: User = chatSchema.createUser("@folabi", "afolabi.creator@gmail.com")
+
+group: MultiUser = bolu.createMultiUserRoom([segun])
 group.addRoomAdmin(bolu, segun)
-print(group)
+group.addUserToRoom(segun, folabi)
 
 mutual: DualUser = folabi.createDualUserRoom(abiodun)
-print(mutual)
+mutual.enterChatToRoom(folabi, "Hello world")
+
+print(repr(chatSchema))

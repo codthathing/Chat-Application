@@ -1,13 +1,10 @@
-from datetime import time
-
 class DuplicateTextError(Exception):
     pass
 
 class Message:
-    def __init__(self, created_at: time, text: str, username: str) -> None:
-        self._created_at: time = created_at
+    def __init__(self, created_at: str, text: str) -> None:
+        self._created_at: str = created_at
         self._text: str = text
-        self._username: str = username
     
     @property
     def text(self) -> str:
@@ -20,5 +17,5 @@ class Message:
         
         self._text = new_text
 
-    def __str__(self) -> str:
-        return f"Message: {self._username}"
+    def __repr__(self) -> str:
+        return f"Message(text={self._text}, time={self._created_at})"
