@@ -16,4 +16,7 @@ group.addUserToRoom(segun, folabi)
 mutual: DualUser = folabi.createDualUserRoom(abiodun)
 mutual.enterChatToRoom(folabi, "Hello world")
 
+chatSchema.updateUsername(folabi, "@fola_creator")
+chatSchema.updateEmail(bolu, "boluwatifesther@gmail.com")
+
 print(repr(chatSchema))

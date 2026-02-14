@@ -6,7 +6,9 @@ if TYPE_CHECKING:
     from models.User import User, GroupUser, MutualUser
 
 class ChatRoom(ABC):
-    chatrooms: list["ChatRoom"] = []
+    chatrooms: list["DualUser | MultiUser"] = []
+    roomUsers: list["GroupUser | MutualUser"] = []
+
 
     def __init__(self, user: "User") -> None:
         from models.User import User
@@ -15,7 +17,6 @@ class ChatRoom(ABC):
             raise ValueError("Not a user so can't create a room")
 
         self._room_id: int = randint(0, 1000)
-        ChatRoom.chatrooms.append(self)
 
     @abstractmethod
     def __repr__(self) -> str:
@@ -32,7 +33,13 @@ class DualUser(ChatRoom):
 
         super().__init__(user)
         self._users: list[MutualUser] = []
-        self._users.extend(MutualUser(u.username, u.email) for u in [user, other_user])
+        self._users.extend(MutualUser(u.id, u.username, u.email) for u in [user, other_user])
+        ChatRoom.roomUsers.extend(self._users)
+        ChatRoom.chatrooms.append(self)
+
+    @property
+    def users(self) -> list["MutualUser"]:
+        return self._users
 
     def __repr__(self) -> str:
         return f"DualUser({super().__repr__()}{self._users})"
@@ -57,8 +64,14 @@ class MultiUser(ChatRoom):
 
         super().__init__(user)
         self._users: list[GroupUser] = []
-        self._users.append(GroupUser(user.username, user.email, "admin"))
-        self._users.extend(map(lambda u: GroupUser(u.username, u.email, "user") , other_users))
+        self._users.append(GroupUser(user.id, user.username, user.email, "admin"))
+        self._users.extend(map(lambda u: GroupUser(u.id, u.username, u.email, "user") , other_users))
+        ChatRoom.roomUsers.extend(self._users)
+        ChatRoom.chatrooms.append(self)
+
+    @property
+    def users(self) -> list["GroupUser"]:
+        return self._users
 
     def __repr__(self) -> str:
         return f"MultiUser({super().__repr__()}{self._users})"
@@ -93,7 +106,9 @@ class MultiUser(ChatRoom):
         if newUserObject:
             raise ValueError("User already in group")
 
-        self._users.append(GroupUser(new_user.username, new_user.email, "user"))
+        newUser = GroupUser(new_user.id, new_user.username, new_user.email, "user")
+        self._users.append(newUser)
+        ChatRoom.roomUsers.append(newUser)
 
     def enterChatToRoom(self, user: "User", text: str) -> None:
         userObject: GroupUser | None = next((u for u in self._users if u.username == user.username), None)
