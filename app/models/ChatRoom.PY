@@ -6,9 +6,8 @@ if TYPE_CHECKING:
     from models.User import User, GroupUser, MutualUser
 
 class ChatRoom(ABC):
-    chatrooms: list["DualUser | MultiUser"] = []
+    chatrooms: list["DualChatRoom | MultiChatRoom"] = []
     roomUsers: list["GroupUser | MutualUser"] = []
-
 
     def __init__(self, user: "User") -> None:
         from models.User import User
@@ -24,7 +23,7 @@ class ChatRoom(ABC):
 
 
 
-class DualUser(ChatRoom):
+class DualChatRoom(ChatRoom):
     def __init__(self, user: "User", other_user: "User") -> None:
         from models.User import User, MutualUser
 
@@ -42,7 +41,7 @@ class DualUser(ChatRoom):
         return self._users
 
     def __repr__(self) -> str:
-        return f"DualUser({super().__repr__()}{self._users})"
+        return f"DualChatRoom({super().__repr__()}{self._users})"
     
     def enterChatToRoom(self, user: "User", text: str) -> None:
         userObject: MutualUser | None = next((u for u in self._users if u.username == user.username), None)
@@ -54,7 +53,7 @@ class DualUser(ChatRoom):
 
 
 
-class MultiUser(ChatRoom):
+class MultiChatRoom(ChatRoom):
     def __init__(self, user: "User", other_users: list["User"] = []) -> None:
         from models.User import User, GroupUser
 
@@ -74,7 +73,7 @@ class MultiUser(ChatRoom):
         return self._users
 
     def __repr__(self) -> str:
-        return f"MultiUser({super().__repr__()}{self._users})"
+        return f"MultiChatRoom({super().__repr__()}{self._users})"
 
     def addRoomAdmin(self, admin: "User", new_admin: "User") -> None:
         adminObject: GroupUser | None = next((u for u in self._users if u.username == admin.username), None)

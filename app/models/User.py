@@ -1,5 +1,5 @@
 from models.Message import Message
-from models.ChatRoom import DualUser, MultiUser, ChatRoom
+from models.ChatRoom import DualChatRoom, MultiChatRoom, ChatRoom
 from time import localtime, strftime
 from random import randint
 
@@ -64,11 +64,11 @@ class User:
     def verifyEmail(cls, email: str) -> bool:
         return bool(next((u for u in cls.users if u.email == email), None))
 
-    def createDualUserRoom(self, other_user: "User") -> DualUser:
-        return DualUser(self, other_user)
+    def createDualUserRoom(self, other_user: "User") -> DualChatRoom:
+        return DualChatRoom(self, other_user)
     
-    def createMultiUserRoom(self, other_users: list["User"] = []) -> MultiUser:
-        return MultiUser(self, other_users)
+    def createMultiUserRoom(self, other_users: list["User"] = []) -> MultiChatRoom:
+        return MultiChatRoom(self, other_users)
     
 
 
