@@ -2,13 +2,14 @@ from models.Message import Message
 from models.ChatRoom import DualChatRoom, MultiChatRoom, ChatRoom
 from time import localtime, strftime
 from random import randint
+from re import match
 
 class User:
     users: list["User"] = []
 
     def __init__(self, username: str, email: str) -> None:
-        if username.isalnum():
-            raise ValueError("Username must contain at least one non-alphanumeric character")
+        if not match(r'^[a-zA-Z0-9_]+$', username):
+            raise ValueError("Username can only conta a-Z, 0-9, _")
         
         if User.verifyUsername(username):
             raise ValueError("Username already exists")
@@ -54,7 +55,7 @@ class User:
         return f"Username: {self.username}, Email={self.email}"
     
     def __repr__(self) -> str:
-        return f"User(id={self._id}, username={self._username}, email={self._email})"
+        return f"User(id={self._id}, username=@{self._username}, email={self._email})"
     
     @classmethod
     def verifyUsername(cls, username: str) -> bool:
@@ -109,7 +110,7 @@ class MutualUser:
         return f"Username: {self._username}, Email={self._email})"
     
     def __repr__(self) -> str:
-        return f"MutualUser(id={self._id}, username={self._username}, email={self._email}{", messages=" + str(self._messages) if bool(self._messages) else ''})"
+        return f"MutualUser(id={self._id}, username=@{self._username}, email={self._email}{", messages=" + str(self._messages) if bool(self._messages) else ''})"
     
     def createChat(self, message: str) -> None:
         self._messages.append(Message(strftime("%H:%M:%S", localtime()), message))
@@ -133,4 +134,4 @@ class GroupUser(MutualUser):
         return f"{super().__str__()}, Status: {self._room_status}"
     
     def __repr__(self) -> str:
-        return f"GroupUser(id={self._id}, username={self._username}, email={self._email}, status={self._room_status}{", messages=" + str(self._messages) if bool(self._messages) else ''})"
+        return f"GroupUser(id={self._id}, username=@{self._username}, email={self._email}, status={self._room_status}{", messages=" + str(self._messages) if bool(self._messages) else ''})"

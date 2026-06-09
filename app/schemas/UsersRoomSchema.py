@@ -1,5 +1,6 @@
 from models.User import User
 from models.ChatRoom import ChatRoom
+from re import match
 
 class UsersRoomSchema():
     def __repr__(self) -> str:
@@ -11,8 +12,8 @@ Rooms: {ChatRoom.chatrooms}
         return User(username, email)
     
     def updateUsername(self, user: User, new_username: str) -> None:
-        if new_username.isalnum():
-            raise ValueError("Username must not be alphanumeric")
+        if not match(r'^[a-zA-Z0-9_]+$', new_username):
+            raise ValueError("Username can only conta a-Z, 0-9, _")
         
         if User.verifyUsername(new_username):
             if user.username == new_username:
