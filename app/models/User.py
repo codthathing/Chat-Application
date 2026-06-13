@@ -20,6 +20,7 @@ class User:
         self._id: int = randint(0, 1000)
         self._username: str = username
         self._email: str = email
+        self._friends: list[dict[str, str | ChatRoom]] = []
 
         User.users.append(self)
 
@@ -50,6 +51,10 @@ class User:
                 u.email = new_email
                 
         self._email = new_email
+
+    @property
+    def friends(self) -> list[dict[str, str | ChatRoom]]:
+        return self._friends
     
     def __str__(self) -> str:
         return f"Username: {self.username}, Email={self.email}"
@@ -64,6 +69,30 @@ class User:
     @classmethod
     def verifyEmail(cls, email: str) -> bool:
         return bool(next((u for u in cls.users if u.email == email), None))
+    
+    def addFriends(self, username: str, room: ChatRoom) -> None:
+        self._friends.append({ "username": username, "room": room })
+    
+    def updateUsername(self, new_username: str) -> None:
+        if not match(r'^[a-zA-Z0-9_]+$', new_username):
+            raise ValueError("Username can only conta a-Z, 0-9, _")
+        
+        if User.verifyUsername(new_username):
+            if self.username == new_username:
+                raise ValueError("Kindly enter a different username")
+            else:
+                raise ValueError("Username already exists")
+        else:
+            self.username = new_username
+
+    def updateEmail(self, new_email: str) -> None:
+        if User.verifyEmail(new_email):
+            if self.email == new_email:
+                raise ValueError("Kindly enter a different email")
+            else:
+                raise ValueError("Email already used by a different user")
+        else:
+            self.email = new_email
 
     def createDualUserRoom(self, other_user: "User") -> DualChatRoom:
         return DualChatRoom(self, other_user)

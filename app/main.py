@@ -1,7 +1,17 @@
 from models.User import User
-from schemas.UsersRoomSchema import UsersRoomSchema
+from utils.addFriends import addFriend
+from utils.friendsList import friendsList
 import argparse
 from sys import exit
+
+users: list[dict[str, str]] = [
+    { "username": "pheezy", "email": "akinwunmiolusegun277@gmail.com" },
+    { "username": "fola_creator", "email": "fola.creator@yahoo.com" },
+    { "username": "boyoyo", "email": "ifeanyi.ogbonaya@gmail.com" },
+]
+
+for u in users:
+    User(u["username"], u["email"])
 
 parser = argparse.ArgumentParser("Chat application operations")
 parser.add_argument("-u", "--username", metavar="username", dest="username", required=True, help="The current username")
@@ -23,23 +33,29 @@ if not user:
         elif choice.lower() == "y":
             username: str = input("\nUsername (a-Z, 0-9, _): ")
             email: str = input("Email: ")
-
-            userChatSchema = UsersRoomSchema()
             
-            return userChatSchema.createUser(username, email)
+            return User(username, email)
         elif choice.lower() == "n":
             exit("\nThanks for using Freechat!")
     
     user = verifyOption(user)
 
 
+def userOptions(choice: int, user: User) -> None:
+    match choice:
+        case 1:
+            friendsList(user, userDetails)
+        case 2:
+            addFriend(user, userDetails)
+        case _:
+            print("\nOption not available!")
+
+            userDetails(user)
+
 def userDetails(user: User) -> None:
-    choice: int = int(input(f"\nUsername: {user.username}\nEmail: {user.email}\n\n1. View friends list\n2. Add a new friend\n3. Create a group\n4. User settings\n5. Log out\n\n"))
-    
-    if choice not in range(1, 6):
-        print("\nOption not available!")
+    choice: int = int(input(f"\nUsername: {user.username}\nEmail: {user.email}\n\n1. View friends list\n2. Add a new friend\n3. Create a group\n4. View group list\n5. User settings\n6. Log out\n\n"))
 
-        userDetails(user)
-
+    userOptions(choice, user)
+        
 if user:
     userDetails(user)

@@ -16,6 +16,10 @@ class ChatRoom(ABC):
             raise ValueError("Not a user so can't create a room")
 
         self._room_id: int = randint(0, 1000)
+    
+    @property
+    def room_id(self) -> int:
+        return self._room_id
 
     @abstractmethod
     def __repr__(self) -> str:
