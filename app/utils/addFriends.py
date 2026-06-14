@@ -25,7 +25,7 @@ def friendChatOptions(userDetails: Callable[[User], None], choice: int, user: Us
         case 1:
             newFriendChat(userDetails, user, room)
         case 2:
-            friendsList(user, userDetails)
+            friendsList(user, userDetails, addFriend)
         case 3:
             userDetails(user)
         case _:

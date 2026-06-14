@@ -44,9 +44,11 @@ if not user:
 def userOptions(choice: int, user: User) -> None:
     match choice:
         case 1:
-            friendsList(user, userDetails)
+            friendsList(user, userDetails, addFriend)
         case 2:
             addFriend(user, userDetails)
+        case 6:
+            exit("\nThanks for using Freechat!")
         case _:
             print("\nOption not available!")
 
