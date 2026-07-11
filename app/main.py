@@ -1,5 +1,5 @@
 from models.User import User
-from utils.addFriends import addFriend
+from utils.addFriends import addFriend, friendChatOptions, friendAddCondition
 from utils.friendsList import friendsList
 import argparse
 from sys import exit
@@ -37,16 +37,17 @@ if not user:
             return User(username, email)
         elif choice.lower() == "n":
             exit("\nThanks for using Freechat!")
-    
+        return None
+
     user = verifyOption(user)
 
 
 def userOptions(choice: int, user: User) -> None:
     match choice:
         case 1:
-            friendsList(user, userDetails, addFriend)
+            friendsList(user, userDetails, addFriend, friendChatOptions, friendAddCondition)
         case 2:
-            addFriend(user, userDetails)
+            addFriend(user, userDetails, friendsList)
         case 6:
             exit("\nThanks for using Freechat!")
         case _:

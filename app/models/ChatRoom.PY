@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from random import randint
 from typing import TYPE_CHECKING
+from models.Message import Message
 
 if TYPE_CHECKING:
     from models.User import User, GroupUser, MutualUser
@@ -37,23 +38,28 @@ class DualChatRoom(ChatRoom):
         super().__init__(user)
         self._users: list[MutualUser] = []
         self._users.extend(MutualUser(u.id, u.username, u.email) for u in [user, other_user])
+        self._messages: list[Message] = []
         ChatRoom.roomUsers.extend(self._users)
         ChatRoom.chatrooms.append(self)
 
     @property
     def users(self) -> list["MutualUser"]:
         return self._users
+    
+    @property
+    def messages(self) -> list[Message]:
+        return self._messages
 
     def __repr__(self) -> str:
         return f"DualChatRoom({super().__repr__()}{self._users})"
     
-    def enterChatToRoom(self, user: "User", text: str) -> None:
-        userObject: MutualUser | None = next((u for u in self._users if u.username == user.username), None)
+    def enterChatToRoom(self, username: str, text: str) -> None:
+        userObject: MutualUser | None = next((u for u in self._users if u.username == username), None)
 
         if not userObject:
-            raise ValueError("Not a user! can't enter message to room")
+            raise ValueError("Not a member of this chat! can't enter message to chat")
         
-        userObject.createChat(text)
+        self._messages.append(Message(username, text))
 
 
 
@@ -69,12 +75,17 @@ class MultiChatRoom(ChatRoom):
         self._users: list[GroupUser] = []
         self._users.append(GroupUser(user.id, user.username, user.email, "admin"))
         self._users.extend(map(lambda u: GroupUser(u.id, u.username, u.email, "user") , other_users))
+        self._messages: list[Message] = []
         ChatRoom.roomUsers.extend(self._users)
         ChatRoom.chatrooms.append(self)
 
     @property
     def users(self) -> list["GroupUser"]:
         return self._users
+    
+    @property
+    def messages(self) -> list[Message]:
+        return self._messages
 
     def __repr__(self) -> str:
         return f"MultiChatRoom({super().__repr__()}{self._users})"
@@ -113,10 +124,10 @@ class MultiChatRoom(ChatRoom):
         self._users.append(newUser)
         ChatRoom.roomUsers.append(newUser)
 
-    def enterChatToRoom(self, user: "User", text: str) -> None:
-        userObject: GroupUser | None = next((u for u in self._users if u.username == user.username), None)
+    def enterChatToRoom(self, username: str, text: str) -> None:
+        userObject: GroupUser | None = next((u for u in self._users if u.username == username), None)
 
         if not userObject:
-            raise ValueError("Not a user! can't enter message to room")
+            raise ValueError("Not a member of this grouo! can't enter message to the group")
         
-        userObject.createChat(text)
+        self._messages.append(Message(username, text))

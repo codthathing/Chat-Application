@@ -1,14 +1,25 @@
+from time import localtime, strftime
+
 class DuplicateTextError(Exception):
     pass
 
 class Message:
-    def __init__(self, created_at: str, text: str) -> None:
-        self._created_at: str = created_at
+    def __init__(self, username: str, text: str) -> None:
+        self._created_at: str = strftime("%H:%M:%S", localtime())
         self._text: str = text
+        self._username: str = username
+
+    @property
+    def username(self) -> str:
+        return self._username
     
     @property
+    def created_at(self) -> str:
+        return self._created_at
+
+    @property
     def text(self) -> str:
-        return f"Message: {self._text}"
+        return self._text
 
     @text.setter
     def text(self, new_text: str) -> None:

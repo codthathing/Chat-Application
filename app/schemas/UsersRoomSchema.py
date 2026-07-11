@@ -1,5 +1,5 @@
-from models.User import User
-from models.ChatRoom import ChatRoom
+from app.models.User import User
+from app.models.ChatRoom import ChatRoom
 
 class UsersRoomSchema():
     def __repr__(self) -> str:

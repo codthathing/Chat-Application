@@ -1,8 +1,13 @@
 from models.Message import Message
 from models.ChatRoom import DualChatRoom, MultiChatRoom, ChatRoom
-from time import localtime, strftime
 from random import randint
 from re import match
+
+from typing import TypedDict
+
+class FriendEntry(TypedDict):
+    username: str
+    room: DualChatRoom
 
 class User:
     users: list["User"] = []
@@ -20,7 +25,7 @@ class User:
         self._id: int = randint(0, 1000)
         self._username: str = username
         self._email: str = email
-        self._friends: list[dict[str, str | ChatRoom]] = []
+        self._friends: list[FriendEntry] = []
 
         User.users.append(self)
 
@@ -53,7 +58,7 @@ class User:
         self._email = new_email
 
     @property
-    def friends(self) -> list[dict[str, str | ChatRoom]]:
+    def friends(self) -> list[FriendEntry]:
         return self._friends
     
     def __str__(self) -> str:
@@ -70,7 +75,7 @@ class User:
     def verifyEmail(cls, email: str) -> bool:
         return bool(next((u for u in cls.users if u.email == email), None))
     
-    def addFriends(self, username: str, room: ChatRoom) -> None:
+    def addFriends(self, username: str, room: DualChatRoom) -> None:
         self._friends.append({ "username": username, "room": room })
     
     def updateUsername(self, new_username: str) -> None:
@@ -140,9 +145,6 @@ class MutualUser:
     
     def __repr__(self) -> str:
         return f"MutualUser(id={self._id}, username=@{self._username}, email={self._email}{", messages=" + str(self._messages) if bool(self._messages) else ''})"
-    
-    def createChat(self, message: str) -> None:
-        self._messages.append(Message(strftime("%H:%M:%S", localtime()), message))
 
     
 
