@@ -2,12 +2,15 @@ from models.Message import Message
 from models.ChatRoom import DualChatRoom, MultiChatRoom, ChatRoom
 from random import randint
 from re import match
-
 from typing import TypedDict
 
 class FriendEntry(TypedDict):
     username: str
     room: DualChatRoom
+
+class GroupEntry(TypedDict):
+    group_name: str
+    room: MultiChatRoom
 
 class User:
     users: list["User"] = []
@@ -26,6 +29,7 @@ class User:
         self._username: str = username
         self._email: str = email
         self._friends: list[FriendEntry] = []
+        self._groups: list[GroupEntry] = []
 
         User.users.append(self)
 
@@ -60,6 +64,10 @@ class User:
     @property
     def friends(self) -> list[FriendEntry]:
         return self._friends
+
+    @property
+    def groups(self):
+        return self._groups
     
     def __str__(self) -> str:
         return f"Username: {self.username}, Email={self.email}"
@@ -77,7 +85,10 @@ class User:
     
     def addFriends(self, username: str, room: DualChatRoom) -> None:
         self._friends.append({ "username": username, "room": room })
-    
+
+    def addGroup(self, group_name: str, room: MultiChatRoom) -> None:
+        self._groups.append({ "group_name": group_name, "room": room })
+
     def updateUsername(self, new_username: str) -> None:
         if not match(r'^[a-zA-Z0-9_]+$', new_username):
             raise ValueError("Username can only conta a-Z, 0-9, _")
@@ -111,9 +122,6 @@ class MutualUser:
     def __init__(self, id: int, username: str, email: str) -> None:
         if not User.verifyUsername(username):
             raise ValueError("Not a user, create an account!")
-        
-        # if User.verifyEmail(email):
-        #     raise ValueError("Email used by a different user")
 
         self._id: int = id
         self._username: str = username

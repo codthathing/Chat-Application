@@ -90,44 +90,50 @@ class MultiChatRoom(ChatRoom):
     def __repr__(self) -> str:
         return f"MultiChatRoom({super().__repr__()}{self._users})"
 
-    def addRoomAdmin(self, admin: "User", new_admin: "User") -> None:
+    def addRoomAdmin(self, admin: "User", new_admin: "User") -> str:
         adminObject: GroupUser | None = next((u for u in self._users if u.username == admin.username), None)
         newAdminObject: GroupUser | None = next((u for u in self._users if u.username == new_admin.username), None)
 
         if not adminObject:
-            raise ValueError("Not in group! kindly request to join")
+            return "\nNot in group! kindly request to join"
         
         if not newAdminObject:
-            raise ValueError(f"{new_admin.username} not in group! kindly add")
+            return f"\n{new_admin.username} not in group! kindly add"
 
         if adminObject.room_status != "admin":
-            raise ValueError("Not a admin! can't add a new admin")
+            return "\nNot a admin! can't add a new admin"
         
         if newAdminObject.room_status == "admin":
-            raise ValueError("User already a admin in group")
+            return "\nUser already a admin in group"
                 
         newAdminObject.room_status = "admin"
 
-    def addUserToRoom(self, user: "User", new_user: "User") -> None:
+        return "\nNew admin successfully added to the group!"
+
+    def addUserToRoom(self, user: "User", new_user: "User") -> str:
         from models.User import GroupUser
 
         userObject: GroupUser | None = next((u for u in self._users if u.username == user.username), None)
         newUserObject: GroupUser | None = next((u for u in self._users if u.username == new_user.username), None)
 
         if not userObject:
-            raise ValueError("Not a group member! kindly request to join")
+            return "\nNot a group member! kindly request to join"
         
         if newUserObject:
-            raise ValueError("User already in group")
+            return "\nNew user already in group"
 
         newUser = GroupUser(new_user.id, new_user.username, new_user.email, "user")
         self._users.append(newUser)
         ChatRoom.roomUsers.append(newUser)
 
-    def enterChatToRoom(self, username: str, text: str) -> None:
+        return "\nNew user successfully added to the group!"
+
+    def enterChatToRoom(self, username: str, text: str) -> str | None:
         userObject: GroupUser | None = next((u for u in self._users if u.username == username), None)
 
         if not userObject:
-            raise ValueError("Not a member of this grouo! can't enter message to the group")
+            return "Not a member of this group! can't enter message to the group"
         
         self._messages.append(Message(username, text))
+
+        return None
