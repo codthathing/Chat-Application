@@ -1,9 +1,11 @@
 from models.User import User
 from utils.addFriends import addFriend, friendChatOptions, friendAddCondition
-from utils.createGroup import create_group
+from utils.createGroup import create_group, group_chat_details, add_group_member_action
 from utils.friendsList import friendsList
 import argparse
 from sys import exit
+
+from utils.groupsList import groups_list
 
 users: list[dict[str, str]] = [
     { "username": "pheezy", "email": "akinwunmiolusegun277@gmail.com" },
@@ -51,6 +53,8 @@ def userOptions(choice: int, user: User) -> None:
             addFriend(user, userDetails, friendsList)
         case 3:
             create_group(user, userDetails)
+        case 4:
+            groups_list(user, userDetails, create_group, group_chat_details, add_group_member_action())
         case 6:
             exit("\nThanks for using Freechat!")
         case _:

@@ -8,10 +8,6 @@ class FriendEntry(TypedDict):
     username: str
     room: DualChatRoom
 
-class GroupEntry(TypedDict):
-    group_name: str
-    room: MultiChatRoom
-
 class User:
     users: list["User"] = []
 
@@ -29,7 +25,7 @@ class User:
         self._username: str = username
         self._email: str = email
         self._friends: list[FriendEntry] = []
-        self._groups: list[GroupEntry] = []
+        self._groups: list[str] = []
 
         User.users.append(self)
 
@@ -66,7 +62,7 @@ class User:
         return self._friends
 
     @property
-    def groups(self):
+    def groups(self) -> list[str]:
         return self._groups
     
     def __str__(self) -> str:
@@ -86,8 +82,8 @@ class User:
     def addFriends(self, username: str, room: DualChatRoom) -> None:
         self._friends.append({ "username": username, "room": room })
 
-    def addGroup(self, group_name: str, room: MultiChatRoom) -> None:
-        self._groups.append({ "group_name": group_name, "room": room })
+    def addGroup(self, group_name: str) -> None:
+        self._groups.append(group_name)
 
     def updateUsername(self, new_username: str) -> None:
         if not match(r'^[a-zA-Z0-9_]+$', new_username):
@@ -113,8 +109,8 @@ class User:
     def createDualUserRoom(self, other_user: "User") -> DualChatRoom:
         return DualChatRoom(self, other_user)
     
-    def createMultiUserRoom(self, other_users: list["User"] = []) -> MultiChatRoom:
-        return MultiChatRoom(self, other_users)
+    def createMultiUserRoom(self, group_name: str, other_users: list["User"] = []) -> MultiChatRoom:
+        return MultiChatRoom(group_name, self, other_users)
     
 
 

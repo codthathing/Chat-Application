@@ -11,7 +11,7 @@ def friendsList(user: User, userDetails: UserDetailsFn, addFriend: AddFriendFn, 
         for i, friend in enumerate(user.friends, start=1):
             print(f"{i}. {friend['username']}")
 
-        choice = int(input("\n1. Visit friend chat\n2. Go home\n\n"))
+        choice = int(input("\n1. Visit friend chat\n2. Add a friend\n3. Go home\n\n"))
         friendsListOption(userDetails, friendChatOptions, friendAddCondition, choice, user)
     else:
         choice = int(input("You currently have no friends!\n\n1. Add a friend\n2. Go home\n\n"))
