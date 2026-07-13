@@ -54,7 +54,7 @@ def userOptions(choice: int, user: User) -> None:
         case 3:
             create_group(user, userDetails)
         case 4:
-            groups_list(user, userDetails, create_group, group_chat_details, add_group_member_action())
+            groups_list(user, userDetails, create_group, group_chat_details, add_group_member_action)
         case 6:
             exit("\nThanks for using Freechat!")
         case _:
