@@ -7,7 +7,8 @@ if TYPE_CHECKING:
     from models.User import User, GroupUser, MutualUser
 
 class ChatRoom(ABC):
-    chatrooms: list["DualChatRoom | MultiChatRoom"] = []
+    chatroom: list["DualChatRoom | MultiChatRoom"] = []
+    roomUsers: list["MutualUser | GroupUser"] = []
 
     def __init__(self, user: "User") -> None:
         from models.User import User
@@ -38,7 +39,8 @@ class DualChatRoom(ChatRoom):
         self._users: list[MutualUser] = []
         self._users.extend(MutualUser(u.id, u.username, u.email) for u in [user, other_user])
         self._messages: list[Message] = []
-        ChatRoom.chatrooms.append(self)
+        ChatRoom.chatroom.append(self)
+        ChatRoom.roomUsers.extend(self._users)
 
     @property
     def users(self) -> list["MutualUser"]:
@@ -62,7 +64,10 @@ class DualChatRoom(ChatRoom):
 
 
 class MultiChatRoom(ChatRoom):
-    def __init__(self, group_name: str, user: "User", other_users: list["User"] = []) -> None:
+    def __init__(self, group_name: str, user: "User", other_users: list["User"] | None = None) -> None:
+        if not other_users:
+            other_users = []
+
         from models.User import User, GroupUser
 
         for u in other_users:
@@ -73,9 +78,10 @@ class MultiChatRoom(ChatRoom):
         self._group_name: str = group_name
         self._users: list[GroupUser] = []
         self._users.append(GroupUser(user.id, user.username, user.email, "admin"))
-        self._users.extend(map(lambda u: GroupUser(u.id, u.username, u.email, "user") , other_users))
+        self._users.extend(map(lambda other_u: GroupUser(other_u.id, other_u.username, other_u.email, "user") , other_users))
         self._messages: list[Message] = []
-        ChatRoom.chatrooms.append(self)
+        ChatRoom.chatroom.append(self)
+        ChatRoom.roomUsers.extend(self._users)
 
     @property
     def group_name(self) -> str:

@@ -18,7 +18,7 @@ def friendsList(user: User, userDetails: UserDetailsFn, addFriend: AddFriendFn, 
         friendsListEmpty(userDetails, addFriend, choice, user)
 
 
-def notFriendsOptions(userDetails: UserDetailsFn, friendChatOptions: FriendChatOptionsFn, friendAddCondition: FriendAddConditionFn, user: User, choice: int, friendUsername: str) -> None:
+def notFriendsOptions(userDetails: UserDetailsFn, friendChatOptions: FriendChatOptionsFn, friendAddCondition: FriendAddConditionFn, user: User, choice: int, friendUsername: str):
     match choice:
         case 1:
             friendsListOption(userDetails, friendChatOptions, friendAddCondition, choice, user)
@@ -29,10 +29,10 @@ def notFriendsOptions(userDetails: UserDetailsFn, friendChatOptions: FriendChatO
         case _:
             choice = int(input(f"\nUser @{friendUsername} not part of friends list!\n\n1. Try again\n2. Add @{friendUsername} to friends list\n3. Go home\n\n"))
 
-            return notFriendsOptions(userDetails, friendChatOptions, friendAddCondition, user, choice, friendUsername)
+            notFriendsOptions(userDetails, friendChatOptions, friendAddCondition, user, choice, friendUsername)
 
 
-def friendsListOption(userDetails: UserDetailsFn, friendChatOptions: FriendChatOptionsFn, friendAddCondition: FriendAddConditionFn, choice: int, user: User) -> None:
+def friendsListOption(userDetails: UserDetailsFn, friendChatOptions: FriendChatOptionsFn, friendAddCondition: FriendAddConditionFn, choice: int, user: User):
     match choice:
         case 1:
             friendUsername: str = input("\nEnter friend username: ")
@@ -40,7 +40,7 @@ def friendsListOption(userDetails: UserDetailsFn, friendChatOptions: FriendChatO
             room: DualChatRoom | None = next((r["room"] for r in user.friends if r["username"] == friendUsername), None)
 
             if room:
-                if len(room.messages) > 0:
+                if room.messages:
                     sorted_messages: list[Message] = sorted(room.messages, key=lambda m: m.created_at)
 
                     print("")
@@ -60,10 +60,10 @@ def friendsListOption(userDetails: UserDetailsFn, friendChatOptions: FriendChatO
         case _:
             choice = int(input(f"\n{choice} not part of options available!\n\n1. View friend chat\n2. Go home\n\n"))
 
-            return friendsListOption(userDetails, friendChatOptions, friendAddCondition, choice, user)
+            friendsListOption(userDetails, friendChatOptions, friendAddCondition, choice, user)
 
 
-def friendsListEmpty(userDetails: UserDetailsFn, addFriend: AddFriendFn, choice: int, user: User) -> None:
+def friendsListEmpty(userDetails: UserDetailsFn, addFriend: AddFriendFn, choice: int, user: User):
     match choice:
         case 1:
             addFriend(user, userDetails, friendsList)
@@ -72,4 +72,4 @@ def friendsListEmpty(userDetails: UserDetailsFn, addFriend: AddFriendFn, choice:
         case _:
             choice = int(input(f"\n{choice} not part of options available!\n\n1. Add a friend\n2. Go home\n\n"))
 
-            return friendsListEmpty(userDetails, addFriend, choice, user)
+            friendsListEmpty(userDetails, addFriend, choice, user)

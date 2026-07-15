@@ -13,7 +13,7 @@ class User:
 
     def __init__(self, username: str, email: str) -> None:
         if not match(r'^[a-zA-Z0-9_]+$', username):
-            raise ValueError("Username can only conta a-Z, 0-9, _")
+            raise ValueError("Username can only contains a-Z, 0-9, _")
         
         if User.verifyUsername(username):
             raise ValueError("Username already exists")
@@ -40,7 +40,7 @@ class User:
     @username.setter
     def username(self, new_username: str) -> None:
         for u in ChatRoom.roomUsers:
-            if u.id == self._id:
+            if u.user_id == self._id:
                 u.username = new_username
 
         self._username = new_username
@@ -52,7 +52,7 @@ class User:
     @email.setter
     def email(self, new_email: str) -> None:
         for u in ChatRoom.roomUsers:
-            if u.id == self._id:
+            if u.user_id == self._id:
                 u.email = new_email
                 
         self._email = new_email
@@ -87,7 +87,7 @@ class User:
 
     def updateUsername(self, new_username: str) -> None:
         if not match(r'^[a-zA-Z0-9_]+$', new_username):
-            raise ValueError("Username can only conta a-Z, 0-9, _")
+            raise ValueError("Username can only contains a-Z, 0-9, _")
         
         if User.verifyUsername(new_username):
             if self.username == new_username:
@@ -109,24 +109,27 @@ class User:
     def createDualUserRoom(self, other_user: "User") -> DualChatRoom:
         return DualChatRoom(self, other_user)
     
-    def createMultiUserRoom(self, group_name: str, other_users: list["User"] = []) -> MultiChatRoom:
+    def createMultiUserRoom(self, group_name: str, other_users: list["User"] | None = None) -> MultiChatRoom:
+        if not other_users:
+            other_users = []
+
         return MultiChatRoom(group_name, self, other_users)
     
 
 
 class MutualUser:
-    def __init__(self, id: int, username: str, email: str) -> None:
+    def __init__(self, user_id: int, username: str, email: str) -> None:
         if not User.verifyUsername(username):
             raise ValueError("Not a user, create an account!")
 
-        self._id: int = id
+        self._user_id: int = user_id
         self._username: str = username
         self._email: str = email
         self._messages: list[Message] = []
 
     @property
-    def id(self) -> int:
-        return self._id
+    def user_id(self) -> int:
+        return self._user_id
     
     @property
     def username(self) -> str:
@@ -148,13 +151,13 @@ class MutualUser:
         return f"Username: {self._username}, Email={self._email})"
     
     def __repr__(self) -> str:
-        return f"MutualUser(id={self._id}, username=@{self._username}, email={self._email}{", messages=" + str(self._messages) if bool(self._messages) else ''})"
+        return f"MutualUser(id={self._user_id}, username=@{self._username}, email={self._email}{", messages=" + str(self._messages) if bool(self._messages) else ''})"
 
     
 
 class GroupUser(MutualUser):
-    def __init__(self, id: int, username: str, email: str, room_status: str) -> None:
-        super().__init__(id, username, email)
+    def __init__(self, user_id: int, username: str, email: str, room_status: str) -> None:
+        super().__init__(user_id, username, email)
         self._room_status: str = room_status
 
     @property
@@ -169,4 +172,4 @@ class GroupUser(MutualUser):
         return f"{super().__str__()}, Status: {self._room_status}"
     
     def __repr__(self) -> str:
-        return f"GroupUser(id={self._id}, username=@{self._username}, email={self._email}, status={self._room_status}{", messages=" + str(self._messages) if bool(self._messages) else ''})"
+        return f"GroupUser(id={self._user_id}, username=@{self._username}, email={self._email}, status={self._room_status}{", messages=" + str(self._messages) if bool(self._messages) else ''})"

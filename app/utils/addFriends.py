@@ -26,7 +26,7 @@ def addFriend(user: User, userDetails: UserDetailsFn, friendsList: FriendsListFn
     friendAddCondition(userDetails, friendsList, user, friend)
 
 
-def friendChatOptions(userDetails: UserDetailsFn, friendsList: FriendsListFn, choice: int, user: User, room: DualChatRoom) -> None:
+def friendChatOptions(userDetails: UserDetailsFn, friendsList: FriendsListFn, choice: int, user: User, room: DualChatRoom):
     match choice:
         case 1:
             newFriendChat(userDetails, friendsList, user, room)
@@ -37,7 +37,7 @@ def friendChatOptions(userDetails: UserDetailsFn, friendsList: FriendsListFn, ch
         case _:
             choice = int(input(f"{choice} not part of options available!\n\n1. Enter new chat\n2. View friend list\n3. Go home\n\n"))
 
-            return friendChatOptions(userDetails, friendsList, choice, user, room)
+            friendChatOptions(userDetails, friendsList, choice, user, room)
 
 
 def newFriendChat(userDetails: UserDetailsFn, friendsList: FriendsListFn, user: User, room: DualChatRoom) -> None:
@@ -58,7 +58,7 @@ def newFriendChat(userDetails: UserDetailsFn, friendsList: FriendsListFn, user: 
     friendChatOptions(userDetails, friendsList, choice, user, room)
 
 
-def friendExists(userDetails: UserDetailsFn, friendsList: FriendsListFn, choice: int, user: User, room: DualChatRoom) -> None:
+def friendExists(userDetails: UserDetailsFn, friendsList: FriendsListFn, choice: int, user: User, room: DualChatRoom):
     match choice:
         case 1:
             newFriendChat(userDetails, friendsList, user, room)
@@ -67,10 +67,10 @@ def friendExists(userDetails: UserDetailsFn, friendsList: FriendsListFn, choice:
         case _:
             choice = int(input(f"\n{choice} not part of options available!\n\n1. Chat with friend\n2. Go home\n\n"))
 
-            return friendExists(userDetails, friendsList, choice, user, room)
+            friendExists(userDetails, friendsList, choice, user, room)
 
 
-def noFriendExists(userDetails: UserDetailsFn, friendsList: FriendsListFn, choice: int, user: User) -> None:
+def noFriendExists(userDetails: UserDetailsFn, friendsList: FriendsListFn, choice: int, user: User):
     match choice:
         case 1:
             addFriend(user, userDetails, friendsList)
@@ -79,4 +79,4 @@ def noFriendExists(userDetails: UserDetailsFn, friendsList: FriendsListFn, choic
         case _:
             choice = int(input(f"\n{choice} not part of options available!\n\n1. Try again\n2. Go home\n\n"))
 
-            return noFriendExists(userDetails, friendsList, choice, user)
+            noFriendExists(userDetails, friendsList, choice, user)
