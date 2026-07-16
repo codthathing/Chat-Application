@@ -15,10 +15,10 @@ class User:
         if not match(r'^[a-zA-Z0-9_]+$', username):
             raise ValueError("Username can only contains a-Z, 0-9, _")
         
-        if User.verifyUsername(username):
+        if User.verify_username(username):
             raise ValueError("Username already exists")
         
-        if User.verifyEmail(email):
+        if User.verify_email(email):
             raise ValueError("Email used by a different user")
 
         self._id: int = randint(0, 1000)
@@ -72,44 +72,48 @@ class User:
         return f"User(id={self._id}, username=@{self._username}, email={self._email})"
     
     @classmethod
-    def verifyUsername(cls, username: str) -> bool:
+    def verify_username(cls, username: str) -> bool:
         return bool(next((u for u in cls.users if u.username == username), None))
     
     @classmethod
-    def verifyEmail(cls, email: str) -> bool:
+    def verify_email(cls, email: str) -> bool:
         return bool(next((u for u in cls.users if u.email == email), None))
     
-    def addFriends(self, username: str, room: DualChatRoom) -> None:
+    def add_friends(self, username: str, room: DualChatRoom) -> None:
         self._friends.append({ "username": username, "room": room })
 
-    def addGroup(self, group_name: str) -> None:
+    def add_group(self, group_name: str) -> None:
         self._groups.append(group_name)
 
-    def updateUsername(self, new_username: str) -> None:
+    def update_username(self, new_username: str) -> str:
         if not match(r'^[a-zA-Z0-9_]+$', new_username):
-            raise ValueError("Username can only contains a-Z, 0-9, _")
+            return "Username can only contain a-Z, 0-9, _"
         
-        if User.verifyUsername(new_username):
+        if User.verify_username(new_username):
             if self.username == new_username:
-                raise ValueError("Kindly enter a different username")
+                return "Kindly enter a different username"
             else:
-                raise ValueError("Username already exists")
+                return "Username already exists"
         else:
             self.username = new_username
 
-    def updateEmail(self, new_email: str) -> None:
-        if User.verifyEmail(new_email):
+            return "Username successfully changed!"
+
+    def update_email(self, new_email: str) -> str:
+        if User.verify_email(new_email):
             if self.email == new_email:
-                raise ValueError("Kindly enter a different email")
+                return "Kindly enter a different email"
             else:
-                raise ValueError("Email already used by a different user")
+                return "Email already used by a different user"
         else:
             self.email = new_email
 
-    def createDualUserRoom(self, other_user: "User") -> DualChatRoom:
+            return "Email successfully updated!"
+
+    def create_dual_user_room(self, other_user: "User") -> DualChatRoom:
         return DualChatRoom(self, other_user)
     
-    def createMultiUserRoom(self, group_name: str, other_users: list["User"] | None = None) -> MultiChatRoom:
+    def create_multi_user_room(self, group_name: str, other_users: list["User"] | None = None) -> MultiChatRoom:
         if not other_users:
             other_users = []
 
@@ -119,7 +123,7 @@ class User:
 
 class MutualUser:
     def __init__(self, user_id: int, username: str, email: str) -> None:
-        if not User.verifyUsername(username):
+        if not User.verify_username(username):
             raise ValueError("Not a user, create an account!")
 
         self._user_id: int = user_id
