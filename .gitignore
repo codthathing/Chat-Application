@@ -1,2 +1,4 @@
 /venv
+/database.db
+/models.py
 **/__pycache__/
