@@ -3,6 +3,7 @@ from models.Message import Message
 from models.ChatRoom import DualChatRoom
 from models.User import User
 from checkers.types import UserDetailsFn, FriendsListFn
+from requests import post
 
 def friend_already_exists(choice: int, user: User, user_details: UserDetailsFn, friends_list: FriendsListFn, room: DualChatRoom) -> None:
     match choice:
@@ -40,6 +41,17 @@ def friend_add_condition(user_details: UserDetailsFn, friends_list: FriendsListF
 
             friend_already_exists(choice, user, user_details, friends_list, mutual_room)
         else:
+            friend_id: str = new_friend.id
+            u_id = user.id
+
+            response = post("http://127.0.0.1:8000/friends", json={"friend_id": friend_id, "u_id": u_id})
+
+            if not response.ok:
+                print(f"\nError: {response.status_code} {response.text}")
+
+                choice = int(input("\nUnable to create friend\n\n1. Try Again\n2. Go home\n\n"))
+                no_friend_exists(user_details, friends_list, choice, user)
+
             mutual_room: DualChatRoom = user.create_dual_user_room(new_friend)
             user.add_friends(friend, mutual_room)
 

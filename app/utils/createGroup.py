@@ -2,6 +2,7 @@ from typing import Callable, TypeVar, Any
 from models.ChatRoom import MultiChatRoom
 from models.User import User, GroupUser
 from checkers.types import UserDetailsFn, GroupsListFn, FriendAddConditionFn, FriendsListFn
+from requests import post
 
 T = TypeVar("T")
 
@@ -177,12 +178,34 @@ def group_created_options(choice, user_details: UserDetailsFn, friend_add_condit
 
             group_created_options(choice, user_details, friend_add_condition, friends_list, groups_list, user, room, group_name)
 
+
+def unable_to_create_group(choice: int, user: User, user_details: UserDetailsFn, friend_add_condition: FriendAddConditionFn, friends_list: FriendsListFn, groups_list: GroupsListFn):
+    match choice:
+        case 1:
+            group_name = input("\nEnter a group name: ")
+            create_group_steps(user, user_details, friend_add_condition, friends_list, groups_list, group_name)
+        case 2:
+            user_details(user)
+        case _:
+            choice = int(input(f"{choice} choice not part of options availabe\n\n1. Try Again\n2. Go home\n\n"))
+
+            unable_to_create_group(choice, user, user_details, friend_add_condition, friends_list, groups_list)
+
+
 def create_group_steps(user: User, user_details: UserDetailsFn, friend_add_condition: FriendAddConditionFn, friends_list: FriendsListFn, groups_list: GroupsListFn, group_name: str):
     choice = int(input("\nDo you want to enter new users? \n\n1. Yes (Enter new users)\n2. No (Create group as only user)\n\n"))
 
     group_users = create_group_options(user, user_details, choice, friend_add_condition, friends_list)
 
     if group_users is not None:
+        response = post("http://127.0.0.1:8000/groups", json={"group_name": group_name, "u_id": user.id})
+
+        if not response.ok:
+            print(f"\nError: {response.status_code} {response.text}")
+
+            choice = int(input("\nUnable to create friend\n\n1. Try Again\n2. Go home\n\n"))
+            unable_to_create_group(choice, user, user_details, friend_add_condition, friends_list, groups_list)
+
         multi_room = user.create_multi_user_room(group_name, group_users)
 
         user.add_group(group_name)

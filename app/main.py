@@ -6,15 +6,12 @@ import argparse
 from sys import exit
 from utils.groupsList import groups_list
 from utils.userSettings import user_settings
+from requests import get, post
 
-users: list[dict[str, str]] = [
-    { "username": "pheezy", "email": "akinwunmiolusegun277@gmail.com" },
-    { "username": "fola_creator", "email": "fola.creator@yahoo.com" },
-    { "username": "boyoyo", "email": "ifeanyi.ogbonaya@gmail.com" },
-]
+users = get("http://127.0.0.1:8000/users").json()
 
 for u in users:
-    User(u["username"], u["email"])
+    User(u["id"], u["username"], u["email"])
 
 parser = argparse.ArgumentParser("Chat application operations")
 parser.add_argument("-u", "--username", metavar="username", dest="username", required=True, help="The current username")
@@ -24,25 +21,35 @@ args: argparse.Namespace = parser.parse_args()
 user: User | None = next((u for u in User.users if u.username == args.username), None)
 
 if not user:
-    choice: str = input("No user account found, do you want to create an account? (Y/N) ")
+    choice: str = input("\nNo user account found, do you want to create an account? (Y/N) ")
 
-    def verify_option(user_object: User | None) -> User | None:
+    def verify_option() -> User | None:
         global choice
 
         if choice.lower() not in ["y", "n"]:
             choice = input(f"\n{choice.upper()} not an option! Do you want to create an account? (Y/N) ")
 
-            return verify_option(user_object)
+            return verify_option()
         elif choice.lower() == "y":
             username: str = input("\nUsername (a-Z, 0-9, _): ")
             email: str = input("Email: ")
-            
-            return User(username, email)
+            password: str = input("Password: ")
+
+            response = post("http://127.0.0.1:8000/users", json={"username":username, "email":email, "password":password})
+
+            if not response.ok:
+                print(f"\nError: {response.status_code} {response.text}")
+
+                choice = input(f"\nTry Again? (Y/N) ")
+                return verify_option()
+
+            user_data = response.json()
+            return User(user_data.id, user_data.username, user_data.email)
         elif choice.lower() == "n":
             exit("\nThanks for using Freechat!")
         return None
 
-    user = verify_option(user)
+    user = verify_option()
 
 
 def user_options(options_choice: int, user_options_profile: User) -> None:

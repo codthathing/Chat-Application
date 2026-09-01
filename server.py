@@ -5,6 +5,7 @@ import models
 from database import engine, SessionLocal
 from sqlalchemy.orm import Session
 import bcrypt
+from typing import List
 
 
 app = FastAPI()
@@ -31,15 +32,6 @@ class AddFriendRequest(BaseModel):
     u_id: UUID
     friend_id: UUID
 
-# class AddFriendResponse(BaseModel):
-#     id: int
-#     room_id: UUID
-#     friend_id: UUID
-#     u_id: UUID
-#     friend_lastname: str | None = None
-#     friend_firstname: str | None = None
-#     status: str
-
 class Group(BaseModel):
     group_name: str = Field(min_length=1, max_length=20)
     u_id: UUID
@@ -65,9 +57,14 @@ def get_db():
         db.close()
 
 
-@app.get("/")
-def read_root(db: Session = Depends(get_db)):
-    return {"users": db.query(models.User).all(), "rooms": db.query(models.Room).all(), "groups": db.query(models.Group).all(), "group-members": db.query(models.GroupMember).all(), "friends": db.query(models.Friend).all()}
+@app.get("/users", response_model=List[UserOut])
+def get_users(db: Session = Depends(get_db)):
+    return db.query(models.User).all()
+
+
+@app.get("/users/{username}", response_model=UserOut)
+def get_user(username: str, db: Session = Depends(get_db)):
+    return db.query(models.User).filter(models.User.username == username).first()
 
 
 @app.post("/users", response_model=UserOut)
@@ -80,6 +77,11 @@ def upload_user(user: User, db: Session = Depends(get_db)):
     db.refresh(user_model)
 
     return user_model
+
+
+@app.get("/friends")
+def get_friends(db: Session = Depends(get_db)):
+    return db.query(models.Friend).all()
 
 
 @app.post("/friends")
@@ -103,6 +105,11 @@ def add_friend(request: AddFriendRequest, db: Session = Depends(get_db)):
     db.refresh(friend_one)
 
     return friend_one
+
+
+@app.get("/groups")
+def get_groups(db: Session = Depends(get_db)):
+    return db.query(models.Group).all()
 
 
 @app.post("/groups")

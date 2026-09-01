@@ -1,6 +1,6 @@
+from uuid import UUID
 from models.Message import Message
 from models.ChatRoom import DualChatRoom, MultiChatRoom, ChatRoom
-from random import randint
 from re import match
 from typing import TypedDict
 
@@ -11,7 +11,7 @@ class FriendEntry(TypedDict):
 class User:
     users: list["User"] = []
 
-    def __init__(self, username: str, email: str) -> None:
+    def __init__(self, uid: str, username: str, email: str) -> None:
         if not match(r'^[a-zA-Z0-9_]+$', username):
             raise ValueError("Username can only contains a-Z, 0-9, _")
         
@@ -21,7 +21,7 @@ class User:
         if User.verify_email(email):
             raise ValueError("Email used by a different user")
 
-        self._id: int = randint(0, 1000)
+        self._id: str = uid
         self._username: str = username
         self._email: str = email
         self._friends: list[FriendEntry] = []
@@ -30,7 +30,7 @@ class User:
         User.users.append(self)
 
     @property
-    def id(self) -> int:
+    def id(self) -> str:
         return self._id
 
     @property
