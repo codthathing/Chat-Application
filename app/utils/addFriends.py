@@ -1,8 +1,8 @@
 from typing import cast
-from models.Message import Message
-from models.ChatRoom import DualChatRoom
-from models.User import User
-from checkers.types import UserDetailsFn, FriendsListFn
+from app.models.Message import Message
+from app.models.ChatRoom import DualChatRoom
+from app.models.User import User
+from app.checkers.types import UserDetailsFn, FriendsListFn
 from requests import post
 
 def friend_already_exists(choice: int, user: User, user_details: UserDetailsFn, friends_list: FriendsListFn, room: DualChatRoom) -> None:
@@ -52,7 +52,9 @@ def friend_add_condition(user_details: UserDetailsFn, friends_list: FriendsListF
                 choice = int(input("\nUnable to create friend\n\n1. Try Again\n2. Go home\n\n"))
                 no_friend_exists(user_details, friends_list, choice, user)
 
-            mutual_room: DualChatRoom = user.create_dual_user_room(new_friend)
+            data = response.json()
+
+            mutual_room: DualChatRoom = user.create_dual_user_room(data["room_id"], new_friend)
             user.add_friends(friend, mutual_room)
 
             choice = int(input("\nNew friend successfully added!\n\n1. Chat with friend\n2. Go home\n\n"))

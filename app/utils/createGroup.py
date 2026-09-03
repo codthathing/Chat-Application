@@ -1,7 +1,7 @@
 from typing import Callable, TypeVar, Any
-from models.ChatRoom import MultiChatRoom
-from models.User import User, GroupUser
-from checkers.types import UserDetailsFn, GroupsListFn, FriendAddConditionFn, FriendsListFn
+from app.models.ChatRoom import MultiChatRoom
+from app.models.User import User, GroupUser
+from app.checkers.types import UserDetailsFn, GroupsListFn, FriendAddConditionFn, FriendsListFn
 from requests import post
 
 T = TypeVar("T")
@@ -206,9 +206,11 @@ def create_group_steps(user: User, user_details: UserDetailsFn, friend_add_condi
             choice = int(input("\nUnable to create friend\n\n1. Try Again\n2. Go home\n\n"))
             unable_to_create_group(choice, user, user_details, friend_add_condition, friends_list, groups_list)
 
-        multi_room = user.create_multi_user_room(group_name, group_users)
+        data = response.json()
 
-        user.add_group(group_name)
+        multi_room = user.create_multi_user_room(data["group"]["id"], group_name, group_users)
+
+        user.add_group(group_name, multi_room)
 
         choice = int(input("\nGroup successfully created!\n\n1. Enter group chat\n2. View group list\n3. Go home\n\n"))
 

@@ -1,15 +1,24 @@
-from uuid import UUID
-from models.Message import Message
-from models.ChatRoom import DualChatRoom, MultiChatRoom, ChatRoom
+from __future__ import annotations
 from re import match
-from typing import TypedDict
+from typing import TypedDict, TYPE_CHECKING
+from uuid import UUID
+
+if TYPE_CHECKING:
+    from app.models.ChatRoom import DualChatRoom, MultiChatRoom, ChatRoom
+    from app.models.Message import Message
 
 class FriendEntry(TypedDict):
     username: str
     room: DualChatRoom
 
+class GroupEntry(TypedDict):
+    group_name: str
+    room: MultiChatRoom
+
 class User:
-    users: list["User"] = []
+    from app.models.ChatRoom import DualChatRoom, MultiChatRoom
+
+    users: list[User] = []
 
     def __init__(self, uid: str, username: str, email: str) -> None:
         if not match(r'^[a-zA-Z0-9_]+$', username):
@@ -25,7 +34,7 @@ class User:
         self._username: str = username
         self._email: str = email
         self._friends: list[FriendEntry] = []
-        self._groups: list[str] = []
+        self._groups: list[GroupEntry] = []
 
         User.users.append(self)
 
@@ -39,6 +48,8 @@ class User:
     
     @username.setter
     def username(self, new_username: str) -> None:
+        # from app.models.ChatRoom import ChatRoom
+
         for u in ChatRoom.roomUsers:
             if u.user_id == self._id:
                 u.username = new_username
@@ -51,6 +62,8 @@ class User:
     
     @email.setter
     def email(self, new_email: str) -> None:
+        from app.models.ChatRoom import ChatRoom
+
         for u in ChatRoom.roomUsers:
             if u.user_id == self._id:
                 u.email = new_email
@@ -62,7 +75,7 @@ class User:
         return self._friends
 
     @property
-    def groups(self) -> list[str]:
+    def groups(self) -> list[GroupEntry]:
         return self._groups
     
     def __str__(self) -> str:
@@ -82,13 +95,13 @@ class User:
     def add_friends(self, username: str, room: DualChatRoom) -> None:
         self._friends.append({ "username": username, "room": room })
 
-    def add_group(self, group_name: str) -> None:
-        self._groups.append(group_name)
+    def add_group(self, group_name: str, room: MultiChatRoom ) -> None:
+        self._groups.append({ "group_name": group_name, "room": room })
 
     def update_username(self, new_username: str) -> str:
         if not match(r'^[a-zA-Z0-9_]+$', new_username):
             return "Username can only contain a-Z, 0-9, _"
-        
+
         if User.verify_username(new_username):
             if self.username == new_username:
                 return "Kindly enter a different username"
@@ -110,29 +123,33 @@ class User:
 
             return "Email successfully updated!"
 
-    def create_dual_user_room(self, other_user: "User") -> DualChatRoom:
-        return DualChatRoom(self, other_user)
+    def create_dual_user_room(self, room_id: UUID, other_user: User) -> DualChatRoom:
+        from app.models.ChatRoom import DualChatRoom
+
+        return DualChatRoom(room_id, self, other_user)
     
-    def create_multi_user_room(self, group_name: str, other_users: list["User"] | None = None) -> MultiChatRoom:
+    def create_multi_user_room(self, room_id: UUID, group_name: str, other_users: list[User] | None = None) -> MultiChatRoom:
+        from app.models.ChatRoom import MultiChatRoom
+
         if not other_users:
             other_users = []
 
-        return MultiChatRoom(group_name, self, other_users)
+        return MultiChatRoom(room_id, group_name, self, other_users)
     
 
 
 class MutualUser:
-    def __init__(self, user_id: int, username: str, email: str) -> None:
+    def __init__(self, user_id: str, username: str, email: str) -> None:
         if not User.verify_username(username):
             raise ValueError("Not a user, create an account!")
 
-        self._user_id: int = user_id
+        self._user_id: str = user_id
         self._username: str = username
         self._email: str = email
         self._messages: list[Message] = []
 
     @property
-    def user_id(self) -> int:
+    def user_id(self) -> str:
         return self._user_id
     
     @property
@@ -160,7 +177,7 @@ class MutualUser:
     
 
 class GroupUser(MutualUser):
-    def __init__(self, user_id: int, username: str, email: str, room_status: str) -> None:
+    def __init__(self, user_id: str, username: str, email: str, room_status: str) -> None:
         super().__init__(user_id, username, email)
         self._room_status: str = room_status
 

@@ -1,5 +1,5 @@
-from checkers.types import UserDetailsFn
-from models.User import User
+from app.checkers.types import UserDetailsFn
+from app.models.User import User
 
 def user_settings_option(choice: int, user: User, user_details: UserDetailsFn):
     match choice:

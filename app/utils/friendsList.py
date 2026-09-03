@@ -1,7 +1,7 @@
-from models.ChatRoom import DualChatRoom
-from models.User import User
-from models.Message import Message
-from checkers.types import UserDetailsFn, AddFriendFn, FriendChatOptionsFn, FriendAddConditionFn
+from app.models.ChatRoom import DualChatRoom
+from app.models.User import User
+from app.models.Message import Message
+from app.checkers.types import UserDetailsFn, AddFriendFn, FriendChatOptionsFn, FriendAddConditionFn
 
 
 def friends_list(user: User, user_details: UserDetailsFn, add_friend: AddFriendFn, friend_chat_options: FriendChatOptionsFn, friend_add_condition: FriendAddConditionFn) -> None:

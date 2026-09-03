@@ -1,7 +1,7 @@
 from typing import cast
-from models.ChatRoom import MultiChatRoom, ChatRoom
-from models.User import User
-from checkers.types import GroupChatDetailsFn, UserDetailsFn, CreateGroupFn, AddGroupMemberActionFn, CreateGroupStepsFn, \
+from app.models.ChatRoom import MultiChatRoom, ChatRoom
+from app.models.User import User
+from app.checkers.types import GroupChatDetailsFn, UserDetailsFn, CreateGroupFn, AddGroupMemberActionFn, CreateGroupStepsFn, \
     FriendAddConditionFn, FriendsListFn
 
 
@@ -84,7 +84,7 @@ def groups_list(user: User, user_details: UserDetailsFn, friend_add_condition: F
         print("\nGroups:")
 
         for i, g in enumerate(user.groups, start=1):
-            print(f"{i}. {g}")
+            print(f"{i}. {g["group_name"]}")
 
         choice = int(input("\n1. Visit group chat\n2. Create group chat\n3. Go home\n\n"))
 

@@ -1,11 +1,11 @@
 from uuid import UUID
 from fastapi import FastAPI, HTTPException, Depends
-from pydantic import Field, BaseModel
+from pydantic import Field, BaseModel, ConfigDict
 import models
 from database import engine, SessionLocal
 from sqlalchemy.orm import Session
 import bcrypt
-from typing import List
+from typing import List, cast
 
 
 app = FastAPI()
@@ -24,9 +24,29 @@ class UserOut(BaseModel):
     profile: str | None = None
     firstname: str | None = None
     lastname: str | None = None
+    model_config = ConfigDict(from_attributes=True)
 
-    class Config:
-        from_attributes = True
+class FriendOut(BaseModel):
+    room_id: UUID
+    id: UUID
+    username: str
+    model_config = ConfigDict(from_attributes=True)
+
+# class GroupMemberOut(BaseModel):
+#     id: UUID
+#     username: str
+#     email: str
+#     role: str
+#     model_config = ConfigDict(from_attributes=True)
+
+class GroupOut(BaseModel):
+    room_id: UUID
+    group_name: str
+    model_config = ConfigDict(from_attributes=True)
+
+class UserDetailsOut(BaseModel):
+    friends: list[FriendOut]
+    groups: list[GroupOut]
 
 class AddFriendRequest(BaseModel):
     u_id: UUID
@@ -62,9 +82,31 @@ def get_users(db: Session = Depends(get_db)):
     return db.query(models.User).all()
 
 
-@app.get("/users/{username}", response_model=UserOut)
-def get_user(username: str, db: Session = Depends(get_db)):
-    return db.query(models.User).filter(models.User.username == username).first()
+@app.get("/users/{user_id}", response_model=UserOut)
+def get_user(user_id: UUID, db: Session = Depends(get_db)):
+    return db.query(models.User).filter(models.User.id == user_id).first()
+
+
+@app.get("/users/me/{user_id}", response_model=UserDetailsOut)
+def get_user_details(user_id: UUID, db: Session = Depends(get_db)):
+    friends = db.query(models.Friend).filter(models.Friend.u_id == user_id).all()
+    groups = db.query(models.GroupMember).filter(models.GroupMember.u_id == user_id).all()
+
+    friends_details = []
+    for f in friends:
+        friend = get_user(cast(UUID, cast(object, f.friend_id)), db)
+
+        if friend:
+            friends_details.append({"room_id": f.room_id, "id": friend.id, "username": friend.username})
+
+    groups_details = []
+    for g in groups:
+        group = db.query(models.Group).filter(models.Group.id == g.group_id).first()
+
+        if group:
+            groups_details.append({"room_id": group.id, "group_name": group.group_name})
+
+    return {"friends": friends_details, "groups": groups_details}
 
 
 @app.post("/users", response_model=UserOut)
@@ -129,6 +171,11 @@ def create_group(group: Group, db: Session = Depends(get_db)):
     db.refresh(group_member)
 
     return {"group": group_obj, "membership": group_member}
+
+
+@app.get("/group-members")
+def get_group_members(db: Session = Depends(get_db)):
+    return db.query(models.GroupMember).all()
 
 
 @app.post("/group-members")

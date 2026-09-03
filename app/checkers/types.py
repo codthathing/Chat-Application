@@ -1,6 +1,6 @@
 from typing import TypeAlias, Callable
-from models.User import User
-from models.ChatRoom import DualChatRoom, MultiChatRoom
+from app.models.User import User
+from app.models.ChatRoom import DualChatRoom, MultiChatRoom
 
 UserDetailsFn: TypeAlias = Callable[[User], None]
 
