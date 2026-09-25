@@ -1,11 +1,11 @@
-from time import localtime, strftime
+from datetime import datetime
 
 class DuplicateTextError(Exception):
     pass
 
 class Message:
-    def __init__(self, username: str, text: str) -> None:
-        self._created_at: str = strftime("%H:%M:%S", localtime())
+    def __init__(self, username: str, text: str, time_stamp: str) -> None:
+        self._created_at: str = datetime.fromisoformat(time_stamp).strftime("%H:%M:%S")
         self._text: str = text
         self._username: str = username
 
@@ -24,7 +24,7 @@ class Message:
     @text.setter
     def text(self, new_text: str) -> None:
         if new_text == self._text:
-            raise DuplicateTextError("Cannot set text to the same value")
+            raise DuplicateTextError("\nCannot set text to the same value")
         
         self._text = new_text
 

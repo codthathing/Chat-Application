@@ -1,3 +1,29 @@
-/venv
-/database.db
-**/__pycache__/
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Database
+database.db
+*.sqlite3
+
+# Environment/secrets
+.env
+.env.local
+
+# IDE
+.idea/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS
+.DS_Store
+Thumbs.db

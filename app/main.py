@@ -1,12 +1,12 @@
-from app.models.User import User
-from app.utils.addFriends import add_friend, friend_chat_options, friend_add_condition
-from app.utils.createGroup import create_group, group_chat_details, add_group_member_action, create_group_steps
-from app.utils.friendsList import friends_list
+from app.models.user_model import User
+from app.services.add_friend_service import add_friend, friend_chat_options, friend_add_condition
+from app.services.create_group_service import create_group, group_chat_details, add_group_member_action, create_group_steps
+from app.services.friends_list_service import friends_list
 import argparse
 from sys import exit
-from app.utils.groupsList import groups_list
-from app.utils.userSettings import user_settings
-from app.utils.getUser import get_user
+from app.services.groups_list_service import groups_list
+from app.services.user_settings_service import user_settings
+from app.utils.get_user_details import get_user_details
 from requests import get
 
 users = get("http://127.0.0.1:8000/users").json()
@@ -19,7 +19,7 @@ parser.add_argument("-u", "--username", metavar="username", dest="username", req
 
 args: argparse.Namespace = parser.parse_args()
 
-user: User | None = get_user(args.username)
+user: User | None = get_user_details(args.username)
 
 def user_options(options_choice: int, user_options_profile: User) -> None:
     match options_choice:

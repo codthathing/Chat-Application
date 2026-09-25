@@ -1,7 +1,8 @@
-from app.models.ChatRoom import DualChatRoom
-from app.models.User import User
-from app.models.Message import Message
+from app.models.chatroom_model import DualChatRoom
+from app.models.user_model import User
 from app.checkers.types import UserDetailsFn, AddFriendFn, FriendChatOptionsFn, FriendAddConditionFn
+from app.utils.get_room_messages import get_room_messages
+from app.utils.display_mutual_messages import display_mutual_messages
 
 
 def friends_list(user: User, user_details: UserDetailsFn, add_friend: AddFriendFn, friend_chat_options: FriendChatOptionsFn, friend_add_condition: FriendAddConditionFn) -> None:
@@ -23,7 +24,7 @@ def not_friends_options(user_details: UserDetailsFn, friend_chat_options: Friend
         case 1:
             friends_list_option(user_details, friend_chat_options, friend_add_condition, add_friend, choice, user)
         case 2:
-            friend_add_condition(user_details, friends_list, user, friend_username)
+            friend_add_condition(user_details, friends_list, user, friend_username, False)
         case 3:
             user_details(user)
         case _:
@@ -40,17 +41,8 @@ def friends_list_option(user_details: UserDetailsFn, friend_chat_options: Friend
             room: DualChatRoom | None = next((r["room"] for r in user.friends if r["username"] == friend_username), None)
 
             if room:
-                if room.messages:
-                    sorted_messages: list[Message] = sorted(room.messages, key=lambda m: m.created_at)
-
-                    print("")
-
-                    for msg in sorted_messages:
-                        print(f"[{msg.created_at}] {msg.username}: {msg.text}")
-
-                choice = int(input("\n1. Enter new chat\n2. View friend list\n3. Go home\n\n"))
-
-                friend_chat_options(user_details, friends_list, choice, user, room)
+                get_room_messages(room)
+                display_mutual_messages(user, user_details, friends_list, room)
             else:
                 choice = int(input(f"\nUser @{friend_username} not part of friends list!\n\n1. Try again\n2. Add @{friend_username} to friends list\n3. Go home\n\n"))
 

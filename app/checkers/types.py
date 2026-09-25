@@ -1,6 +1,7 @@
 from typing import TypeAlias, Callable
-from app.models.User import User
-from app.models.ChatRoom import DualChatRoom, MultiChatRoom
+from requests import Response
+from app.models.user_model import User
+from app.models.chatroom_model import DualChatRoom, MultiChatRoom
 
 UserDetailsFn: TypeAlias = Callable[[User], None]
 
@@ -8,7 +9,7 @@ AddFriendFn: TypeAlias = Callable[[User, UserDetailsFn, "FriendsListFn"], None]
 
 FriendChatOptionsFn: TypeAlias = Callable[[UserDetailsFn, "FriendsListFn", int, User, DualChatRoom], None]
 
-FriendAddConditionFn: TypeAlias = Callable[[UserDetailsFn, "FriendsListFn", User, str], None]
+FriendAddConditionFn: TypeAlias = Callable[[UserDetailsFn, "FriendsListFn", User, str, bool], str | None]
 
 FriendsListFn: TypeAlias = Callable[[User, UserDetailsFn, AddFriendFn, FriendChatOptionsFn, FriendAddConditionFn], None]
 
@@ -16,7 +17,7 @@ GroupChatDetailsFn: TypeAlias = Callable[[UserDetailsFn, User, FriendAddConditio
 
 CreateGroupFn: TypeAlias = Callable[[User, UserDetailsFn, FriendAddConditionFn, FriendsListFn, "GroupsListFn"], None]
 
-AddGroupMemberActionFn: TypeAlias = Callable[[UserDetailsFn, User, FriendAddConditionFn, FriendsListFn, "GroupsListFn", MultiChatRoom, str, str, Callable[[User, User], str], Callable[[str], str], bool], None]
+AddGroupMemberActionFn: TypeAlias = Callable[[UserDetailsFn, User, Callable[[User], Response], str, FriendAddConditionFn, FriendsListFn, "GroupsListFn", MultiChatRoom, str, str, Callable[[User, User], str], Callable[[str], str], bool], None]
 
 CreateGroupStepsFn: TypeAlias = Callable[[User, UserDetailsFn, FriendAddConditionFn, FriendsListFn, "GroupsListFn", str], None]
 
